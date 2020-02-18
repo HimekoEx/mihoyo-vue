@@ -1,0 +1,187 @@
+/* Reset CSS */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  font-family: "方正黑体";
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 以下是自定义CSS */
+.root {
+  height: 100%;
+  width: 100%;
+}
+
+.el-loading {
+  position: absolute;
+  z-index: 2000;
+  background-color: rgba(255, 255, 255, .7);
+  margin: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-transition: opacity .3s;
+  transition: opacity .3s;
+}
+
+.el-loading-spinner {
+  top: 50%;
+  margin-top: -21px;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+}
+
+/* 菜单关闭 */
+.el-submenu>.el-submenu__title .el-submenu__icon-arrow {
+  -webkit-transform: rotateZ(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotateZ(-90deg);
+}
+
+/* 菜单展开 */
+.el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow {
+  -webkit-transform: rotateZ(0deg);
+  -ms-transform: rotate(0deg);
+  transform: rotateZ(0deg);
+}
+
+/* 面包屑 */
+.el-breadcrumb {
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+/* 卡片视图 */
+.el-card {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !;
+}
+
+/* 表格样式 */
+.el-table {
+  font-size: 14px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
