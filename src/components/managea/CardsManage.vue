@@ -334,13 +334,8 @@ export default {
           // 保存数据
           this.total = res.data.total
           this.cards = res.data.items
-          console.log(res.data.items)
         })
         .catch(this.$API.error)
-    },
-    // 辅助CDK到粘贴板
-    copyCDK(card) {
-      console.log(this.$copyText)
     },
     // 复制成功事件
     onCopy() {
@@ -438,7 +433,6 @@ export default {
           }
 
           // 创建成功
-          console.log(res.data.items)
           this.$message.success({
             message: '创建成功',
             duration: 1500
