@@ -16,6 +16,15 @@
       , 文件名一定要是
       <span>.uif</span>
     </h4>
+    <h4>
+      4. 若还闪退, 将
+      <span>/sdcard/Android/data/top.mihoyo/</span>
+      文件夹下的
+      <span>RunTime.log</span>
+      文件最后的内容截图找
+      <span>负责人</span>
+      解决
+    </h4>
   </div>
 </template>
 
@@ -25,13 +34,12 @@ h2 {
 }
 
 h4 {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   span {
     margin-left: 5px;
     margin-right: 5px;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bolder;
-    font-style: italic;
     color: #f00;
   }
 }
