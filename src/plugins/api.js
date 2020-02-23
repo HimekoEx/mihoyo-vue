@@ -55,6 +55,8 @@ const API = {
   userLogin: form => axios.post('/user/login', form).then(res => res.data),
   // 用户注册
   userRegister: form => axios.post('/user/register', form).then(res => res.data),
+  // 获取侧栏数据
+  leftMenu: () => axios.post('user/left-menu').then(res => res.data),
   // 用户退出
   userLogout: () => axios.post('/user/logout').then(res => res.data),
   // 获取用户信息

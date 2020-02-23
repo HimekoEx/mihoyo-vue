@@ -35,6 +35,9 @@
 export default {
   name: 'left-menu',
   created() {
+    this.getLiftMenu()
+
+    // 加载侧栏折叠
     if (document.body.clientWidth <= 900) this.isCollapse = true
     else if (localStorage.lm_is === 'true') this.isCollapse = true
   },
@@ -42,50 +45,29 @@ export default {
     return {
       // 是否折叠
       isCollapse: false,
-      items: [
-        {
-          icon: 'iconfont icon-user-group-fill',
-          name: '用户中心',
-          path: '/user',
-          children: [
-            {
-              icon: 'iconfont icon-user-fill',
-              name: '用户信息',
-              path: '/user_info'
-            },
-            {
-              icon: 'iconfont icon-terminal-fill',
-              name: '卡密激活',
-              path: '/user_activate'
-            },
-            {
-              icon: 'iconfont icon-guizeyinqing',
-              name: '生成UIF',
-              path: '/user_uif'
-            }
-          ]
-        },
-        {
-          icon: 'iconfont icon-yingyongguanli',
-          name: '运营中心',
-          path: '/managea',
-          children: [
-            {
-              icon: 'iconfont icon-quanxianshenpi',
-              name: '用户管理',
-              path: '/managea_users'
-            },
-            {
-              icon: 'iconfont icon-guanlianshebei',
-              name: '卡密管理',
-              path: '/managea_cards'
-            }
-          ]
-        }
-      ]
+      items: []
     }
   },
   methods: {
+    // 获取侧栏数据
+    getLiftMenu() {
+      this.$API
+        .leftMenu()
+        .then(res => {
+          if (res.status !== 200 || res.data === null) {
+            return this.$notify.error({
+              title: `获取失败(${res.status})`,
+              message: `错误信息: ${res.msg}`,
+              duration: 2000,
+              offset: 40
+            })
+          }
+
+          this.items = JSON.parse(res.data)
+        })
+        .catch(this.$API.error)
+    },
+    // 设置侧栏折叠
     toggleCollapse() {
       this.isCollapse = localStorage.lm_is = !this.isCollapse
     }
