@@ -20,6 +20,7 @@
             placeholder="请输入用户名"
             v-model="loginForm.user_name"
             prefix-icon="iconfont icon-user-fill"
+            @keyup.enter.native="toLogin"
           ></el-input>
         </el-form-item>
         <!-- 密码 -->
@@ -29,6 +30,7 @@
             v-model="loginForm.password"
             prefix-icon="iconfont icon-lock"
             show-password
+            @keyup.enter.native="toLogin"
           ></el-input>
         </el-form-item>
         <!-- 按钮区域 -->
