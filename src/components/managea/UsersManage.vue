@@ -150,7 +150,7 @@
       :visible.sync="attrEditVisible"
       center
       class="atteEdit"
-      :width="windowWidth() > 650 ? '50%' : '100%'"
+      :width="$utils.windowWidth() > 800 ? '50%' : '100%'"
       @close="closeDialog"
     >
       <!-- 内容主体区 -->
@@ -181,7 +181,7 @@
       :title="curOperUser.user_name + ' - 时效编辑'"
       :visible.sync="timeEditVisible"
       center
-      :width="windowWidth() > 650 ? '50%' : '100%'"
+      :width="$utils.windowWidth() > 800 ? '50%' : '100%'"
       @close="closeDialog"
     >
       <el-select
@@ -205,11 +205,12 @@
       :title="curOperUser.user_name + ' - 权限编辑'"
       :visible.sync="powerEditVisible"
       center
-      :width="windowWidth() > 650 ? '50%' : '100%'"
+      :width="$utils.windowWidth() > 800 ? '50%' : '100%'"
       @close="closeDialog"
     >
       <div class="power">
         <el-radio-group v-model="curOperUser.level" @change="changeLevel">
+          <el-radio-button :label="200">超管理</el-radio-button>
           <el-radio-button :label="100">管理员</el-radio-button>
           <el-radio-button :label="0">白嫖党</el-radio-button>
         </el-radio-group>
@@ -333,7 +334,7 @@ export default {
       this.changeStatusForm.status = user.status
 
       this.$API
-        .cardscreate(this.changeStatusForm)
+        .usersChangeStatus(this.changeStatusForm)
         .then(res => {
           // 操作失败
           if (res.status !== 200) {
@@ -559,10 +560,6 @@ export default {
         time: 0
       }
       this.date = null
-    },
-    // 获取屏幕宽度
-    windowWidth: () => {
-      return document.body.clientWidth
     }
   }
 }

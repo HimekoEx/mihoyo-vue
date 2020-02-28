@@ -13,6 +13,9 @@ export default {
     if (!this.$utils.isEmpty(sessionStorage.user)) {
       this.$store.dispatch('setUser', JSON.parse(sessionStorage.user))
     }
+
+    // 获取屏幕宽度
+    this.$utils.windowWidth = () => document.body.clientWidth
   }
 }
 </script>

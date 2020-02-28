@@ -189,80 +189,80 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
       ></el-pagination>
+    </el-card>
 
-      <!-- 时效编辑对话框 -->
-      <el-dialog
-        title="创建卡密"
-        :visible.sync="createCardsVisible"
-        center
-        :width="windowWidth() > 650 ? '70%' : '100%'"
-        @close="cleanCreateCards"
-        class="create-cards"
-      >
-        <!-- 项目选择器 -->
-        <div>
-          <el-select v-model="cardsCreateForm.project_name" placeholder="选择项目">
-            <el-option label="崩坏3" value="Honkai3RD"></el-option>
-            <el-option label="明日方舟" value="aks" disabled></el-option>
-          </el-select>
+    <!-- 时效编辑对话框 -->
+    <el-dialog
+      title="创建卡密"
+      :visible.sync="createCardsVisible"
+      center
+      :width="$utils.windowWidth() > 800 ? '70%' : '100%'"
+      @close="cleanCreateCards"
+      class="create-cards"
+    >
+      <!-- 项目选择器 -->
+      <div>
+        <el-select v-model="cardsCreateForm.project_name" placeholder="选择项目">
+          <el-option label="崩坏3" value="Honkai3RD"></el-option>
+          <el-option label="明日方舟" value="aks" disabled></el-option>
+        </el-select>
+      </div>
+
+      <div class="select">
+        <!-- 卡密级别选择器 -->
+        <el-select v-model="cardsCreateForm.level">
+          <el-option label="请选择级别" :value="0" disabled></el-option>
+          <el-option label="珀金版" :value="3"></el-option>
+          <el-option label="黄金版" :value="2"></el-option>
+          <el-option label="青铜版" :value="1"></el-option>
+        </el-select>
+
+        <!-- 卡密时效选择器 -->
+        <el-select v-model="cardsCreateForm.time">
+          <el-option label="请选择时效" :value="0" disabled></el-option>
+          <el-option label="年卡" :value="7"></el-option>
+          <el-option label="半年" :value="6"></el-option>
+          <el-option label="季卡" :value="5"></el-option>
+          <el-option label="月卡" :value="4"></el-option>
+          <el-option label="周卡" :value="3"></el-option>
+          <el-option label="天卡" :value="2"></el-option>
+          <el-option label="时卡" :value="1"></el-option>
+        </el-select>
+      </div>
+
+      <!-- 卡密创建数量 -->
+      <div>
+        <el-progress type="dashboard" :percentage="cardsCreateForm.number" :color="colors"></el-progress>
+
+        <div class="nuberBtns" v-if="$utils.windowWidth() > 750">
+          <el-button type="warning" @click="addNumber(10)">+10</el-button>
+          <el-button type="primary" @click="addNumber(5)">+05</el-button>
+          <el-button type="success" @click="addNumber(1)">+01</el-button>
+          <el-button type="success" @click="subNumber(1)">-01</el-button>
+          <el-button type="primary" @click="subNumber(5)">-05</el-button>
+          <el-button type="warning" @click="subNumber(10)">-10</el-button>
         </div>
-
-        <div class="select">
-          <!-- 卡密级别选择器 -->
-          <el-select v-model="cardsCreateForm.level">
-            <el-option label="请选择级别" :value="0" disabled></el-option>
-            <el-option label="珀金版" :value="3"></el-option>
-            <el-option label="黄金版" :value="2"></el-option>
-            <el-option label="青铜版" :value="1"></el-option>
-          </el-select>
-
-          <!-- 卡密时效选择器 -->
-          <el-select v-model="cardsCreateForm.time">
-            <el-option label="请选择时效" :value="0" disabled></el-option>
-            <el-option label="年卡" :value="7"></el-option>
-            <el-option label="半年" :value="6"></el-option>
-            <el-option label="季卡" :value="5"></el-option>
-            <el-option label="月卡" :value="4"></el-option>
-            <el-option label="周卡" :value="3"></el-option>
-            <el-option label="天卡" :value="2"></el-option>
-            <el-option label="时卡" :value="1"></el-option>
-          </el-select>
-        </div>
-
-        <!-- 卡密创建数量 -->
-        <div>
-          <el-progress type="dashboard" :percentage="cardsCreateForm.number" :color="colors"></el-progress>
-
-          <div class="nuberBtns" v-if="windowWidth() > 750">
-            <el-button type="warning" @click="addNumber(10)">+10</el-button>
-            <el-button type="primary" @click="addNumber(5)">+05</el-button>
+        <template v-else>
+          <div class="nuberBtns">
             <el-button type="success" @click="addNumber(1)">+01</el-button>
             <el-button type="success" @click="subNumber(1)">-01</el-button>
+          </div>
+          <div class="nuberBtns">
+            <el-button type="primary" @click="addNumber(5)">+05</el-button>
             <el-button type="primary" @click="subNumber(5)">-05</el-button>
+          </div>
+          <div class="nuberBtns">
+            <el-button type="warning" @click="addNumber(10)">+10</el-button>
             <el-button type="warning" @click="subNumber(10)">-10</el-button>
           </div>
-          <template v-else>
-            <div class="nuberBtns">
-              <el-button type="success" @click="addNumber(1)">+01</el-button>
-              <el-button type="success" @click="subNumber(1)">-01</el-button>
-            </div>
-            <div class="nuberBtns">
-              <el-button type="primary" @click="addNumber(5)">+05</el-button>
-              <el-button type="primary" @click="subNumber(5)">-05</el-button>
-            </div>
-            <div class="nuberBtns">
-              <el-button type="warning" @click="addNumber(10)">+10</el-button>
-              <el-button type="warning" @click="subNumber(10)">-10</el-button>
-            </div>
-          </template>
-        </div>
+        </template>
+      </div>
 
-        <div>
-          <el-button type="info" @click="cleanCreateCards">清空</el-button>
-          <el-button type="danger" @click="createCards">创建</el-button>
-        </div>
-      </el-dialog>
-    </el-card>
+      <div>
+        <el-button type="info" @click="cleanCreateCards">清空</el-button>
+        <el-button type="danger" @click="createCards">创建</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -441,10 +441,6 @@ export default {
           this.createCardsVisible = false
         })
         .catch(this.$API.error)
-    },
-    // 获取屏幕宽度
-    windowWidth: () => {
-      return document.body.clientWidth
     }
   }
 }

@@ -51,12 +51,11 @@ axios.defaults.withCredentials = true
 const API = {
   // 错误弹窗
   error: error => Vue.prototype.$notify.error({ title: '发送异常', message: error, duration: 0 }),
+
   // 用户登录
   userLogin: form => axios.post('/user/login', form).then(res => res.data),
   // 用户注册
   userRegister: form => axios.post('/user/register', form).then(res => res.data),
-  // 获取侧栏数据
-  leftMenu: () => axios.post('user/left-menu').then(res => res.data),
   // 用户退出
   userLogout: () => axios.post('/user/logout').then(res => res.data),
   // 获取用户信息
@@ -67,6 +66,7 @@ const API = {
   userActivate: form => axios.post('/user/activate', form).then(res => res.data),
   // 获取UIF
   userGenUIF: () => axios.post('/user/uif').then(res => res.data),
+
   // 用户列表查询
   usersList: form => axios.post('/users/list', form).then(res => res.data),
   // 更改用户状态
@@ -83,12 +83,20 @@ const API = {
   usersChangeTime: form => axios.post('/users/time', form).then(res => res.data),
   // 更改用户权限
   usersChangelevel: form => axios.post('/users/level', form).then(res => res.data),
+
   // 卡密列表查询
   cardsList: form => axios.post('/cards/list', form).then(res => res.data),
   // 更改卡密状态
   cardsChangeStatus: form => axios.post('/cards/status', form).then(res => res.data),
   // 创建卡密
-  cardsCreate: form => axios.post('/cards/create', form).then(res => res.data)
+  cardsCreate: form => axios.post('/cards/create', form).then(res => res.data),
+
+  // 获取侧栏数据
+  leftMenu: () => axios.post('/cache/left-menu').then(res => res.data),
+  // Base缓存列表
+  cacheBaselist: form => axios.post('/cache/base/list', form).then(res => res.data),
+  // Base缓存设置
+  cacheBaseSet: form => axios.post('/cache/base/set', form).then(res => res.data)
 }
 
 Vue.prototype.$API = API

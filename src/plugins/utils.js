@@ -30,7 +30,7 @@ const utils = {
       case level === 300:
         return '开发者'
 
-      case level >= 110:
+      case level >= 200:
         return '超管理'
 
       case level >= 100:
