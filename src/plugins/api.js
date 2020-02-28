@@ -96,7 +96,9 @@ const API = {
   // Base缓存列表
   cacheBaselist: form => axios.post('/cache/base/list', form).then(res => res.data),
   // Base缓存设置
-  cacheBaseSet: form => axios.post('/cache/base/set', form).then(res => res.data)
+  cacheBaseSet: form => axios.post('/cache/base/set', form).then(res => res.data),
+  // Base缓存删除
+  cacheBaseDel: form => axios.post('/cache/base/del', form).then(res => res.data)
 }
 
 Vue.prototype.$API = API
