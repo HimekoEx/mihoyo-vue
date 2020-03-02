@@ -4,19 +4,34 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>控制中心</el-breadcrumb-item>
-      <el-breadcrumb-item>Base缓存管理</el-breadcrumb-item>
+      <el-breadcrumb-item>Honkai3RD缓存管理</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区 -->
     <el-card>
       <!-- 工具栏 -->
-      <el-button type="warning" @click="cacheEdit(null)">添加Base缓存</el-button>
+      <div class="tools-bar">
+        <el-select v-model="cacheListForm.channel" placeholder="选择项目" @change="changeChannel">
+          <el-option label="官服" :value="1"></el-option>
+          <el-option label="哔哩" :value="2"></el-option>
+        </el-select>
+        <el-button type="warning" @click="cacheEdit(null)">添加缓存</el-button>
+      </div>
 
       <!-- 列表区 -->
       <el-table :data="cacheData" stripe border>
-        <el-table-column label="Space" prop="space" width="200px"></el-table-column>
         <el-table-column label="Key" prop="key" width="200px"></el-table-column>
         <el-table-column label="Value" prop="value" show-overflow-tooltip></el-table-column>
+        <el-table-column label="状态" width="65" :resizable="false" align="center">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.status"
+              active-color="#2D5"
+              inactive-color="#d21"
+              @change="changeStatus(scope.row)"
+            ></el-switch>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" header-align="center" width="131" :resizable="false">
           <template slot-scope="scope">
             <el-button
@@ -29,7 +44,7 @@
               icon="iconfont icon-shanchu"
               type="danger"
               size="mini"
-              @click="delBaseCache(scope.row)"
+              @click="delCache(scope.row)"
             ></el-button>
           </template>
         </el-table-column>
@@ -49,7 +64,7 @@
 
     <!-- 缓存编辑对话框 -->
     <el-dialog
-      :title="`Base:${cacheSetForm.space}:${cacheSetForm.key} - 缓存编辑`"
+      :title="`${cacheSetForm.key} - 缓存编辑`"
       :visible.sync="cacheEditVisible"
       :close-on-click-modal="false"
       center
@@ -58,17 +73,23 @@
     >
       <el-row>
         <el-col :span="8">
-          <el-input v-model="cacheSetForm.space" placeholder="Space"></el-input>
+          <el-input v-model="cacheSetForm.key" placeholder="Key"></el-input>
         </el-col>
 
         <el-col :offset="1" :span="8">
-          <el-input v-model="cacheSetForm.key" placeholder="Key"></el-input>
+          <el-switch
+            v-model="cacheSetForm.status"
+            active-color="#0cc"
+            active-text="激活"
+            inactive-color="#d21"
+            inactive-text="拉闸"
+          ></el-switch>
         </el-col>
 
         <el-col :offset="1" :span="2">
           <div class="set-btns">
             <el-switch v-model="cacheSetForm.force" active-color="#2D5" inactive-color="#d21"></el-switch>
-            <el-button type="danger" @click="setBaseCache">更改</el-button>
+            <el-button type="danger" @click="setCache">更改</el-button>
           </div>
         </el-col>
       </el-row>
@@ -81,31 +102,33 @@
 <script>
 export default {
   created() {
-    if (!this.$utils.isEmpty(localStorage.bc_ps)) {
-      this.cacheListForm.page_size = parseInt(localStorage.bc_ps)
+    if (!this.$utils.isEmpty(localStorage.hk_ps)) {
+      this.cacheListForm.page_size = parseInt(localStorage.hk_ps)
     }
-    this.listBaseCache()
+    this.listCache()
   },
   data() {
     return {
       // 缓存列表查询表单
       cacheListForm: {
+        channel: 1,
         page_num: 1,
         page_size: 5
       },
       // 缓存设置表当
       cacheSetForm: {
-        space: '',
+        channel: 0,
         key: '',
         value: '',
+        status: false,
         force: false
       },
       // 缓存删除表当
       cacheDelForm: {
-        space: '',
+        channel: 0,
         key: ''
       },
-      // base缓存数据
+      // 缓存数据
       cacheData: [],
       // 查询总数
       total: 0,
@@ -114,10 +137,10 @@ export default {
     }
   },
   methods: {
-    // 获取Base缓存列表
-    listBaseCache() {
+    // 获取崩坏3缓存列表
+    listCache() {
       this.$API
-        .cacheBaselist(this.cacheListForm)
+        .cacheHK3list(this.cacheListForm)
         .then(res => {
           // 获取失败
           if (res.status !== 200) {
@@ -135,13 +158,13 @@ export default {
         })
         .catch(this.$API.error)
     },
-    // 设置Base缓存
-    setBaseCache() {
-      if (this.$utils.isEmpty(this.cacheSetForm.space)) return
+    // 设置崩坏3缓存
+    setCache() {
       if (this.$utils.isEmpty(this.cacheSetForm.key)) return
+      this.cacheSetForm.channel = this.cacheListForm.channel
 
       this.$API
-        .cacheBaseSet(this.cacheSetForm)
+        .cacheHK3Set(this.cacheSetForm)
         .then(res => {
           if (res.status !== 200) {
             return this.$notify.error({
@@ -157,31 +180,54 @@ export default {
             message: res.msg,
             duration: 1500
           })
-          this.listBaseCache()
+          this.listCache()
         })
         .catch(this.$API.error)
     },
-    // 删除Base缓存
-    delBaseCache(cacheInfo) {
-      if (this.$utils.isEmpty(cacheInfo.space)) return
-      if (this.$utils.isEmpty(cacheInfo.key)) return
+    // 缓存状态改变
+    changeStatus(cacheInfo) {
+      this.cacheSetForm.channel = this.cacheListForm.channel
+      this.cacheSetForm.key = cacheInfo.key
+      this.cacheSetForm.value = cacheInfo.value
+      this.cacheSetForm.status = cacheInfo.status
+      this.cacheSetForm.force = true
 
-      this.cacheDelForm.space = cacheInfo.space
+      this.$API
+        .cacheHK3Set(this.cacheSetForm)
+        .then(res => {
+          if (res.status !== 200) {
+            cacheInfo.status = !cacheInfo.status
+            return this.$notify.error({
+              title: `设置失败(${res.status})`,
+              message: `错误信息: ${res.msg}`,
+              duration: 2000,
+              offset: 40
+            })
+          }
+
+          // 成功
+          this.$message.success({
+            message: res.msg,
+            duration: 1500
+          })
+        })
+        .catch(this.$API.error)
+    },
+    // 删除崩坏3缓存
+    delCache(cacheInfo) {
+      if (this.$utils.isEmpty(cacheInfo.key)) return
+      this.cacheDelForm.channel = this.cacheListForm.channel
       this.cacheDelForm.key = cacheInfo.key
 
       this.$msgbox
-        .confirm(
-          `删除缓存 - [Base:${this.cacheDelForm.space}:${this.cacheDelForm.key}]`,
-          '红豆泥?',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'error'
-          }
-        )
+        .confirm(`删除缓存 - [${this.cacheDelForm.key}]`, '红豆泥?', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'error'
+        })
         .then(() => {
           this.$API
-            .cacheBaseDel(this.cacheDelForm)
+            .cacheHK3Del(this.cacheDelForm)
             .then(res => {
               if (res.status !== 200) {
                 return this.$notify.error({
@@ -197,18 +243,22 @@ export default {
                 message: res.msg,
                 duration: 1500
               })
-              this.listBaseCache()
+              this.listCache()
             })
             .catch(this.$API.error)
         })
         .catch(() => {})
     },
+    // 渠道更改事件
+    changeChannel() {
+      this.listCache()
+    },
     // 缓存编辑按钮事件
     cacheEdit(cacheInfo) {
       if (cacheInfo != null) {
-        this.cacheSetForm.space = cacheInfo.space
         this.cacheSetForm.key = cacheInfo.key
         this.cacheSetForm.value = cacheInfo.value
+        this.cacheSetForm.status = cacheInfo.status
       } else this.closeDialog()
 
       this.cacheEditVisible = true
@@ -216,27 +266,37 @@ export default {
     // 关闭对话框事件
     closeDialog(flash) {
       this.cacheSetForm = {
-        space: '',
+        channel: 0,
         key: '',
         value: '',
+        status: false,
         force: false
       }
     },
     // 监听 pageSize 改变的事件
     handleSizeChange(newSize) {
-      this.cacheListForm.page_size = localStorage.bc_ps = newSize
-      this.listBaseCache()
+      this.cacheListForm.page_size = localStorage.hk_ps = newSize
+      this.listCache()
     },
     // 监听页码值改变的事件
     handleCurrentChange(newPage) {
       this.cacheListForm.page_num = newPage
-      this.listBaseCache()
+      this.listCache()
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.el-card {
+  .tools-bar {
+    .el-select {
+      width: 150px;
+      margin-right: 10px;
+    }
+  }
+}
+
 .el-dialog {
   .el-row {
     margin-bottom: 10px;

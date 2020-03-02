@@ -12,6 +12,7 @@ import GenUIF from './components/user/GenUIF.vue'
 import UsersManage from './components/managea/UsersManage.vue'
 import CardsManage from './components/managea/CardsManage.vue'
 import BaseCache from './components/super/BaseCache.vue'
+import HK3Cache from './components/super/Honkai3Cache.vue'
 
 Vue.use(Router)
 
@@ -38,7 +39,8 @@ const router = new Router({
         { path: '/managea_users', component: UsersManage },
         { path: '/managea_cards', component: CardsManage },
         // 超管区
-        { path: '/super_base', component: BaseCache }
+        { path: '/super_base', component: BaseCache },
+        { path: '/super_hk3', component: HK3Cache }
       ]
     }
   ]

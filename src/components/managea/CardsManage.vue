@@ -74,18 +74,11 @@
           prop="created_at"
           width="160"
           :resizable="false"
-          header-align="center"
           align="center"
         ></el-table-column>
         <el-table-column label="项目名" width="100" prop="project_name" show-overflow-tooltip></el-table-column>
         <el-table-column label="创建者" width="150" prop="creator" show-overflow-tooltip></el-table-column>
-        <el-table-column
-          label="级别"
-          width="80"
-          :resizable="false"
-          header-align="center"
-          align="center"
-        >
+        <el-table-column label="级别" width="80" :resizable="false" align="center">
           <template slot-scope="scope">
             <el-tag type="danger" v-if="scope.row.level === 3" effect="plain">
               <b>{{$utils.formatCardsLevel(scope.row.level)}}</b>
@@ -98,13 +91,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column
-          label="时效"
-          width="70"
-          :resizable="false"
-          header-align="center"
-          align="center"
-        >
+        <el-table-column label="时效" width="70" :resizable="false" align="center">
           <template slot-scope="scope">
             <el-tag type="danger" v-if="scope.row.time >= 5" effect="dark">
               <b>{{$utils.formatCardsTime(scope.row.time)}}</b>
@@ -153,21 +140,8 @@
           </template>
         </el-table-column>
         <el-table-column label="使用者" width="150" prop="using_user" show-overflow-tooltip></el-table-column>
-        <el-table-column
-          label="激活日期"
-          prop="using_at"
-          width="160"
-          :resizable="false"
-          header-align="center"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          label="状态"
-          width="65"
-          :resizable="false"
-          header-align="center"
-          align="center"
-        >
+        <el-table-column label="激活日期" prop="using_at" width="160" :resizable="false" align="center"></el-table-column>
+        <el-table-column label="状态" width="65" :resizable="false" align="center">
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.status"

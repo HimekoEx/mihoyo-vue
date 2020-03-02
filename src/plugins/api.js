@@ -98,7 +98,13 @@ const API = {
   // Base缓存设置
   cacheBaseSet: form => axios.post('/cache/base/set', form).then(res => res.data),
   // Base缓存删除
-  cacheBaseDel: form => axios.post('/cache/base/del', form).then(res => res.data)
+  cacheBaseDel: form => axios.post('/cache/base/del', form).then(res => res.data),
+  // 崩坏3缓存列表
+  cacheHK3list: form => axios.post('/cache/hk3/list', form).then(res => res.data),
+  // 崩坏3缓存设置
+  cacheHK3Set: form => axios.post('/cache/hk3/set', form).then(res => res.data),
+  // 崩坏3缓存删除
+  cacheHK3Del: form => axios.post('/cache/hk3/del', form).then(res => res.data)
 }
 
 Vue.prototype.$API = API
