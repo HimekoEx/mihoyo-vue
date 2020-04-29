@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>控制中心</el-breadcrumb-item>
-      <el-breadcrumb-item>Base缓存管理</el-breadcrumb-item>
+      <el-breadcrumb-item>Base 缓存管理</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区 -->
@@ -13,8 +13,13 @@
       <el-button type="warning" @click="cacheEdit(null)">添加Base缓存</el-button>
 
       <!-- 列表区 -->
-      <el-table :data="cacheData" stripe border>
-        <el-table-column label="Space" prop="space" width="200px"></el-table-column>
+      <el-table
+        :data="cacheData"
+        :default-sort="{prop: 'space', order: 'descending'}"
+        stripe
+        border
+      >
+        <el-table-column label="Space" prop="space" width="200px" sortable></el-table-column>
         <el-table-column label="Key" prop="key" width="200px"></el-table-column>
         <el-table-column label="Value" prop="value" show-overflow-tooltip></el-table-column>
         <el-table-column label="操作" header-align="center" width="131" :resizable="false">
@@ -171,8 +176,8 @@ export default {
 
       this.$msgbox
         .confirm(
-          `删除缓存 - [Base:${this.cacheDelForm.space}:${this.cacheDelForm.key}]`,
           '红豆泥?',
+          `删除缓存 - [Base:${this.cacheDelForm.space}:${this.cacheDelForm.key}]`,
           {
             confirmButtonText: '确定',
             cancelButtonText: '取消',

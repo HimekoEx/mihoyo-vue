@@ -52,24 +52,32 @@
           header-align="center"
         ></el-table-column>
         <el-table-column label="用户名" prop="user_name" show-overflow-tooltip></el-table-column>
-        <el-table-column label="QQ号" width="150" prop="qq_number" show-overflow-tooltip></el-table-column>
-        <el-table-column label="邮箱" width="250" prop="e_mail" show-overflow-tooltip></el-table-column>
-        <el-table-column label="级别/状态" header-align="center" width="130" :resizable="false">
+        <el-table-column label="QQ号" prop="qq_number" show-overflow-tooltip></el-table-column>
+        <el-table-column label="邮箱" prop="e_mail" show-overflow-tooltip></el-table-column>
+        <el-table-column label="UIF生成次数" align="center" width="300" :resizable="false">
           <template slot-scope="scope">
-            <el-tag type="danger" v-if="scope.row.level >= 300" effect="dark">
-              <b>{{$utils.formatUserLevel(scope.row.level)}}</b>
+            <el-slider
+              v-model="scope.row.gen_times"
+              :max="3"
+              show-stops
+              :show-tooltip="false"
+              @change="changeTimes(scope.row)"
+            ></el-slider>
+          </template>
+        </el-table-column>
+        <el-table-column label="级别/状态" header-align="center" width="120" :resizable="false">
+          <template slot-scope="scope">
+            <el-tag type="danger" v-if="scope.row.power === 3" effect="dark">
+              <b>{{$utils.formatPowerLevel(scope.row.power)}}</b>
             </el-tag>
-            <el-tag type="warning" v-else-if="scope.row.level >= 100" effect="dark">
-              <b>{{$utils.formatUserLevel(scope.row.level)}}</b>
+            <el-tag type="warning" v-else-if="scope.row.power === 2" effect="dark">
+              <b>{{$utils.formatPowerLevel(scope.row.power)}}</b>
             </el-tag>
-            <el-tag type="success" v-else-if="scope.row.level >= 20" effect="dark">
-              <b>{{$utils.formatUserLevel(scope.row.level)}}</b>
+            <el-tag type="success" v-else-if="scope.row.power === 1" effect="dark">
+              <b>{{$utils.formatPowerLevel(scope.row.power)}}</b>
             </el-tag>
-            <el-tag v-else-if="scope.row.level >= 10" effect="dark">
-              <b>{{$utils.formatUserLevel(scope.row.level)}}</b>
-            </el-tag>
-            <el-tag type="info" v-else-if="scope.row.level < 10" effect="dark">
-              <b>{{$utils.formatUserLevel(scope.row.level)}}</b>
+            <el-tag type="info" v-else-if="scope.row.power === 0" effect="dark">
+              <b>{{$utils.formatPowerLevel(scope.row.power)}}</b>
             </el-tag>
 
             <el-switch
@@ -81,11 +89,11 @@
             ></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" header-align="center" width="195" :resizable="false">
+        <el-table-column label="操作" header-align="center" width="135" :resizable="false">
           <template slot-scope="scope">
             <el-tooltip
               effect="dark"
-              content="属性"
+              content="信息"
               placement="top"
               :enterable="false"
               :disabled="scope.$index > 0"
@@ -95,22 +103,7 @@
                 type="primary"
                 size="mini"
                 :disabled="scope.row.od"
-                @click="attrEdit(scope.row)"
-              ></el-button>
-            </el-tooltip>
-            <el-tooltip
-              effect="dark"
-              content="时效"
-              placement="top"
-              :enterable="false"
-              :disabled="scope.$index > 0"
-            >
-              <el-button
-                icon="iconfont icon-icon_renwujincheng"
-                type="warning"
-                size="mini"
-                :disabled="scope.row.od"
-                @click="timeEdit(scope.row)"
+                @click="infoEdit(scope.row)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -124,7 +117,7 @@
                 icon="iconfont icon-tianshenpi"
                 type="danger"
                 size="mini"
-                :disabled="scope.row.sd"
+                :disabled="scope.row.pd"
                 @click="powerEdit(scope.row)"
               ></el-button>
             </el-tooltip>
@@ -144,60 +137,42 @@
       ></el-pagination>
     </el-card>
 
-    <!-- 属性编辑对话框 -->
+    <!-- 信息编辑对话框 -->
     <el-dialog
-      :title="curOperUser.user_name + ' - 属性编辑'"
-      :visible.sync="attrEditVisible"
-      center
-      class="atteEdit"
-      :width="$utils.windowWidth() > 800 ? '50%' : '100%'"
-      @close="closeDialog"
-    >
-      <!-- 内容主体区 -->
-      <div class="uuid">
-        <span>
-          <b>UUID:</b>
-        </span>
-        <el-input :value="curOperUser.uuid"></el-input>
-        <el-button icon="iconfont icon-delete-fill" type="danger" size="small" @click="cleanUUID"></el-button>
-      </div>
-
-      <div>
-        <span>
-          <b>UIF可用生成次数:</b>
-        </span>
-        <el-slider
-          v-model="curOperUser.gen_times"
-          :max="3"
-          show-stops
-          :show-tooltip="false"
-          @change="changeTimes"
-        ></el-slider>
-      </div>
-    </el-dialog>
-
-    <!-- 时效编辑对话框 -->
-    <el-dialog
-      :title="curOperUser.user_name + ' - 时效编辑'"
-      :visible.sync="timeEditVisible"
+      :title="curOperUser.user_name + ' - 信息编辑'"
+      :visible.sync="infoEditVisible"
+      :close-on-click-modal="false"
       center
       :width="$utils.windowWidth() > 800 ? '50%' : '100%'"
       @close="closeDialog"
     >
-      <el-select
-        v-model="changeTimeForm.project_name"
-        placeholder="请选择项目"
-        @change="selectChange"
-        clearable
-        @clear="selectClean"
+      <el-form
+        ref="infoFormRef"
+        :model="infoForm"
+        :rules="infoFormRules"
+        label-width="auto"
+        class="info_form"
       >
-        <el-option label="崩坏3" value="Honkai3RD"></el-option>
-        <el-option label="明日方舟" value="aks" disabled></el-option>
-      </el-select>
-      <el-date-picker v-model="date" type="datetime" placeholder="选择日期时间"></el-date-picker>
-      <el-tooltip effect="dark" content="更改" placement="top" :enterable="false">
-        <el-button icon="iconfont icon-fabu" type="success" @click="changeTime"></el-button>
-      </el-tooltip>
+        <el-form-item label="ID: ">
+          <el-input :value="infoForm.id" disabled></el-input>
+        </el-form-item>
+
+        <el-form-item label="用户名: " prop="user_name">
+          <el-input v-model="infoForm.user_name" clearable></el-input>
+        </el-form-item>
+
+        <el-form-item label="QQ号: " prop="qq_number">
+          <el-input v-model="infoForm.qq_number" clearable></el-input>
+        </el-form-item>
+
+        <el-form-item label="邮箱: " prop="e_mail">
+          <el-input v-model="infoForm.e_mail" clearable></el-input>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="changeInfos">更改</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
 
     <!-- 权限编辑对话框 -->
@@ -209,10 +184,10 @@
       @close="closeDialog"
     >
       <div class="power">
-        <el-radio-group v-model="curOperUser.level" @change="changeLevel">
-          <el-radio-button :label="200">超管理</el-radio-button>
-          <el-radio-button :label="100">管理员</el-radio-button>
-          <el-radio-button :label="0">白嫖党</el-radio-button>
+        <el-radio-group v-model="curOperUser.power" @change="changePower">
+          <el-radio-button :label="2">超管</el-radio-button>
+          <el-radio-button :label="1">管理</el-radio-button>
+          <el-radio-button :label="0">用户</el-radio-button>
         </el-radio-group>
       </div>
     </el-dialog>
@@ -228,6 +203,38 @@ export default {
     this.listUsers()
   },
   data() {
+    // 验证字符串是否有特殊字符
+    const checkSpecialKey = str => {
+      var specialKey =
+        "[+`~!#$^&*()=|{}':;'\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'"
+      for (var i = 0; i < str.length; i++) {
+        if (specialKey.indexOf(str.substr(i, 1)) !== -1) return false
+      }
+      return true
+    }
+    // 自定义表单验证函数
+    const checkRules = (rule, value, callback) => {
+      if (!value) return callback()
+      setTimeout(() => {
+        switch (rule.fullField) {
+          case 'qq_number':
+            const qqErr = new Error('请输入正确的QQ号')
+            if (isNaN(value)) return callback(qqErr)
+            if (value.length < 5 || value.length > 15) return callback(qqErr)
+            return callback()
+          case 'e_mail':
+            const emErr = new Error('请输入正确的邮箱')
+            const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+            if (value.length < 8 || value.length > 128) return callback(emErr)
+            if (!mailReg.test(value)) return callback(emErr)
+            return callback()
+          default:
+            const err = new Error('请不要输入奇奇怪怪的符号')
+            if (!checkSpecialKey(value)) return callback(err)
+            return callback()
+        }
+      }, 100)
+    }
     return {
       // 用户列表查询表单
       usersListForm: {
@@ -237,26 +244,32 @@ export default {
         page_num: 1,
         page_size: 5
       },
-      // 更改用户状态表单
-      changeStatusForm: {
-        id: 0,
-        status: false
-      },
       // 更改用户UIF生成次数表单
       changeTimesForm: {
         id: 0,
         times: 0
       },
-      // 更改用户子项目时效表单
-      changeTimeForm: {
+      // 更改信息表单绑定对象
+      infoForm: {
         id: 0,
-        project_name: '',
-        time: 0
+        user_name: '',
+        qq_number: '',
+        e_mail: ''
       },
-      // 更改用户权限表单
-      changeLevelForm: {
-        id: 0,
-        level: 0
+      // 表单验证规则对象
+      infoFormRules: {
+        user_name: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          {
+            min: 3,
+            max: 32,
+            message: '用户名长度在 3 到 32 个字符内',
+            trigger: 'blur'
+          },
+          { validator: checkRules, trigger: 'blur' }
+        ],
+        qq_number: [{ validator: checkRules, trigger: 'blur' }],
+        e_mail: [{ validator: checkRules, trigger: 'blur' }]
       },
       // 查询总数
       total: 0,
@@ -269,18 +282,13 @@ export default {
         qq_number: '',
         e_mail: '',
         status: false,
-        level: 0,
-        avatar: '',
-        created_at: '',
+        power: 0,
         gen_times: 0,
-        uuid: ''
+        avatar: '',
+        created_at: ''
       },
-      // 时间选择器数据绑定
-      date: null,
-      // 控制用户属性编辑对话框的显示
-      attrEditVisible: false,
-      // 控制用户时效编辑对话框的显示
-      timeEditVisible: false,
+      // 控制用户信息编辑对话框的显示
+      infoEditVisible: false,
       // 控制用户权限编辑对话框的显示
       powerEditVisible: false
     }
@@ -291,7 +299,6 @@ export default {
       this.$API
         .usersList(this.usersListForm)
         .then(res => {
-          // 获取失败
           if (res.status !== 200) {
             return this.$notify.error({
               title: `获取失败(${res.status})`,
@@ -310,31 +317,49 @@ export default {
           if (this.users != null) {
             this.users.forEach(user => {
               if (user.id === me.id) {
-                user.sd = true
+                user.sd = user.pd = true
                 user.od = false
-              } else if (user.level >= me.level) {
-                user.sd = true
-                user.od = true
+              } else if (user.power >= me.power) {
+                user.sd = user.od = user.pd = true
               } else {
-                user.sd = false
-                user.od = false
+                user.sd = user.od = user.pd = false
               }
             })
           }
         })
         .catch(this.$API.error)
     },
-    // 搜索框清空事件
-    inputClear() {
-      this.listUsers()
-    },
-    // 监听状态更改
-    changeStatus(user) {
-      this.changeStatusForm.id = user.id
-      this.changeStatusForm.status = user.status
+    // 更改UIF生成次数
+    changeTimes(user) {
+      this.changeTimesForm.id = user.id
+      this.changeTimesForm.times = user.gen_times
 
       this.$API
-        .usersChangeStatus(this.changeStatusForm)
+        .usersChangeTimes(this.changeTimesForm)
+        .then(res => {
+          if (res.status !== 200) {
+            return this.$notify.error({
+              title: `操作失败(${res.status})`,
+              message: `错误信息: ${res.msg}`,
+              duration: 2000,
+              offset: 40
+            })
+          }
+
+          this.$message.success({
+            message: res.msg,
+            duration: 1500
+          })
+        })
+        .catch(this.$API.error)
+    },
+    // 更改状态
+    changeStatus(user) {
+      this.$API
+        .usersChangeStatus({
+          id: user.id,
+          status: user.status
+        })
         .then(res => {
           // 操作失败
           if (res.status !== 200) {
@@ -355,6 +380,79 @@ export default {
         })
         .catch(this.$API.error)
     },
+    // 更改信息
+    changeInfos(user) {
+      this.$refs.infoFormRef.validate(valid => {
+        if (!valid) return
+
+        this.$API
+          .usersChangeInfos(this.infoForm)
+          .then(res => {
+            if (res.status !== 200) {
+              return this.$notify.error({
+                title: `操作失败(${res.status})`,
+                message: `错误信息: ${res.msg}`,
+                duration: 2000
+              })
+            }
+
+            this.listUsers()
+            this.$message.success({
+              message: res.msg,
+              duration: 1500
+            })
+          })
+          .catch(this.$API.error)
+      })
+    },
+    // 更改用户权限
+    changePower() {
+      this.$API
+        .usersChangePower({
+          id: this.curOperUser.id,
+          power: this.curOperUser.power
+        })
+        .then(res => {
+          if (res.status !== 200) {
+            this.listUsers()
+            this.powerEditVisible = false
+            return this.$notify.error({
+              title: `操作失败(${res.status})`,
+              message: `错误信息: ${res.msg}`,
+              duration: 2000,
+              offset: 40
+            })
+          }
+
+          this.$message.success({
+            message: res.msg,
+            duration: 1500
+          })
+        })
+        .catch(this.$API.error)
+    },
+    // 信息编辑按钮事件
+    infoEdit(user) {
+      this.curOperUser = user
+
+      this.infoForm = {
+        id: user.id,
+        user_name: user.user_name,
+        qq_number: user.qq_number,
+        e_mail: user.e_mail
+      }
+
+      this.infoEditVisible = true
+    },
+    // 权限编辑按钮事件
+    powerEdit(user) {
+      this.curOperUser = user
+      this.powerEditVisible = true
+    },
+    // 搜索框清空事件
+    inputClear() {
+      this.listUsers()
+    },
     // 监听 pageSize 改变的事件
     handleSizeChange(newSize) {
       this.usersListForm.page_size = localStorage.ul_ps = newSize
@@ -365,181 +463,6 @@ export default {
       this.usersListForm.page_num = newPage
       this.listUsers()
     },
-    // 属性编辑按钮事件
-    attrEdit(user) {
-      this.$API
-        .usersInfoEx(user.id)
-        .then(res => {
-          // 获取失败
-          if (res.status !== 200) {
-            return this.$notify.error({
-              title: `获取失败(${res.status})`,
-              message: `错误信息: ${res.msg}`,
-              duration: 2000,
-              offset: 40
-            })
-          }
-
-          // 保存数据
-          this.curOperUser = res.data
-          this.attrEditVisible = true
-        })
-        .catch(this.$API.error)
-    },
-    // 清空UUID
-    cleanUUID() {
-      if (this.$utils.isEmpty(this.curOperUser.uuid)) return
-
-      this.$msgbox
-        .confirm(`清除 ${this.curOperUser.user_name} 的UUID`, '红豆泥?', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'error'
-        })
-        .then(() => {
-          this.$API
-            .usersCleanUUID(this.curOperUser.id)
-            .then(res => {
-              // 清除失败
-              if (res.status !== 200) {
-                return this.$notify.error({
-                  title: `操作失败(${res.status})`,
-                  message: `错误信息: ${res.msg}`,
-                  duration: 2000,
-                  offset: 40
-                })
-              }
-              // 成功更改
-              this.$message.success({
-                message: '清除成功',
-                duration: 1500
-              })
-              // 保存数据
-              this.curOperUser = res.data
-            })
-            .catch(this.$API.error)
-        })
-        .catch(() => {})
-    },
-    // 改变UIF生成次数
-    changeTimes(newTimes) {
-      this.changeTimesForm.id = this.curOperUser.id
-      this.changeTimesForm.times = newTimes
-
-      this.$API
-        .usersChangeTimes(this.changeTimesForm)
-        .then(res => {
-          // 操作失败
-          if (res.status !== 200) {
-            return this.$notify.error({
-              title: `操作失败(${res.status})`,
-              message: `错误信息: ${res.msg}`,
-              duration: 2000,
-              offset: 40
-            })
-          }
-
-          // 成功更改
-          this.$message.success({
-            message: res.msg,
-            duration: 1500
-          })
-        })
-        .catch(this.$API.error)
-    },
-    // 时效编辑按钮事件
-    timeEdit(user) {
-      this.curOperUser = user
-      this.timeEditVisible = true
-    },
-    // 更爱时效
-    changeTime() {
-      if (this.$utils.isEmpty(this.changeTimeForm.project_name)) return
-      if (this.changeTimeForm.id === 0) return
-      this.changeTimeForm.time = Date.parse(this.date) / 1000
-
-      this.$API
-        .usersChangeTime(this.changeTimeForm)
-        .then(res => {
-          // 操作失败
-          if (res.status !== 200) {
-            this.date = null
-            return this.$notify.error({
-              title: `操作失败(${res.status})`,
-              message: `错误信息: ${res.msg}`,
-              duration: 2000,
-              offset: 40
-            })
-          }
-
-          this.date = new Date(res.data.expire_time * 1000)
-          this.$message.success({
-            message: res.msg,
-            duration: 1500
-          })
-        })
-        .catch(this.$API.error)
-    },
-    // 选择框更改事件
-    selectChange() {
-      if (this.$utils.isEmpty(this.changeTimeForm.project_name)) return
-      this.changeTimeForm.id = this.curOperUser.id
-
-      this.$API
-        .usersCardInfo(this.changeTimeForm)
-        .then(res => {
-          // 操作失败
-          if (res.status !== 200) {
-            return this.$notify.error({
-              title: `操作失败(${res.status})`,
-              message: `错误信息: ${res.msg}`,
-              duration: 2000,
-              offset: 40
-            })
-          }
-
-          this.date = new Date(res.data.expire_time * 1000)
-        })
-        .catch(this.$API.error)
-    },
-    // 选择框内容清空
-    selectClean() {
-      this.date = null
-    },
-    // 权限编辑按钮事件
-    powerEdit(user) {
-      this.curOperUser = user
-      this.powerEditVisible = true
-    },
-    // 更改用户权限
-    changeLevel() {
-      this.changeLevelForm.id = this.curOperUser.id
-      this.changeLevelForm.level = this.curOperUser.level
-
-      this.$API
-        .usersChangelevel(this.changeLevelForm)
-        .then(res => {
-          this.listUsers()
-
-          // 操作失败
-          if (res.status !== 200) {
-            return this.$notify.error({
-              title: `操作失败(${res.status})`,
-              message: `错误信息: ${res.msg}`,
-              duration: 2000,
-              offset: 40
-            })
-          }
-
-          // 刷新用户
-          this.curOperUser = res.data
-          this.$message.success({
-            message: res.msg,
-            duration: 1500
-          })
-        })
-        .catch(this.$API.error)
-    },
     // 关闭弹窗时清空缓存
     closeDialog() {
       this.curOperUser = {
@@ -548,18 +471,12 @@ export default {
         qq_number: '',
         e_mail: '',
         status: false,
-        level: 0,
-        avatar: '',
-        created_at: '',
+        power: 0,
         gen_times: 0,
-        uuid: ''
+        avatar: '',
+        created_at: ''
       }
-      this.changeTimeForm = {
-        id: 0,
-        project_name: '',
-        time: 0
-      }
-      this.date = null
+      this.infoForm = { id: 0, user_name: '', qq_number: '', e_mail: '' }
     }
   }
 }
@@ -573,46 +490,13 @@ export default {
   }
 }
 
-.el-input {
-  width: 300px;
-  margin-right: 15px;
-}
-
 .el-switch {
   margin-left: 10px;
 }
 
-.atteEdit {
-  div {
-    display: flex; /*Flex布局*/
-    display: -webkit-flex; /* Safari */
-    align-items: center; /*指定垂直居中*/
-  }
-
-  .uuid {
-    margin-top: 15px;
-    margin-bottom: 25px;
-  }
-
-  span {
-    font-size: 18px;
-    margin-right: 15px;
-  }
-
-  .el-input {
-    width: 200px;
-    font-size: 18px;
-    margin-right: 15px;
-  }
-
-  .el-slider {
-    width: 300px;
-    margin-left: 10px;
-  }
-}
-
-.el-date-editor {
-  margin-left: 15px;
+.el-slider {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .power {

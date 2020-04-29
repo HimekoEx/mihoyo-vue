@@ -87,7 +87,7 @@ export default {
       }, 100)
     }
     return {
-      // 登录表单绑定对象
+      // 注册表单绑定对象
       registerForm: {
         user_name: '',
         password: '',
@@ -138,7 +138,6 @@ export default {
         this.$API
           .userRegister(this.registerForm)
           .then(res => {
-            // 注册失败
             if (res.status !== 200) {
               return this.$notify.error({
                 title: `注册失败(${res.status})`,
@@ -147,13 +146,11 @@ export default {
               })
             }
 
-            // 注册成功
             this.$notify.success({
               title: '注册成功',
               message: `用户名: ${res.data.user_name} 用户ID: ${res.data.id}`,
               duration: 2000
             })
-
             // 跳转登录页面
             this.$router.push('/login')
           })

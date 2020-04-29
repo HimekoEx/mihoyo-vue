@@ -24,18 +24,28 @@ const utils = {
     let second = now.getSeconds()
     return year + '-' + month + '-' + date + ' ' + hour + ':' + minute + ':' + second
   },
-  // 格式化用户级别
-  formatUserLevel: level => {
+  // 格式化权限级别
+  formatPowerLevel: power => {
     switch (true) {
-      case level === 300:
-        return '开发者'
+      case power === 3:
+        return '开发'
 
-      case level >= 200:
-        return '超管理'
+      case power === 2:
+        return '超管'
 
-      case level >= 100:
-        return '管理员'
+      case power === 1:
+        return '管理'
 
+      case power === 0:
+        return '用户'
+
+      default:
+        return 'Error'
+    }
+  },
+  // 格式化项目级别
+  formatCardLevel: level => {
+    switch (true) {
       case level >= 30:
         return '珀金版'
 
@@ -46,8 +56,10 @@ const utils = {
         return '青铜版'
 
       case level < 10:
-        return '白嫖党'
+        return '白嫖版'
 
+      case level >= 40:
+      case level < 0:
       default:
         return 'Error'
     }

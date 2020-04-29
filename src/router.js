@@ -10,9 +10,11 @@ import UserInfo from './components/user/Info.vue'
 import Activate from './components/user/Activate.vue'
 import GenUIF from './components/user/GenUIF.vue'
 import UsersManage from './components/managea/UsersManage.vue'
+import CardManage from './components/managea/CardManage.vue'
 import CardsManage from './components/managea/CardsManage.vue'
 import BaseCache from './components/super/BaseCache.vue'
 import HK3Cache from './components/super/Honkai3Cache.vue'
+import AKsCache from './components/super/ArknightsCache.vue'
 
 Vue.use(Router)
 
@@ -37,10 +39,12 @@ const router = new Router({
         { path: '/user_uif', component: GenUIF },
         // 管理区
         { path: '/managea_users', component: UsersManage },
+        { path: '/managea_project', component: CardManage },
         { path: '/managea_cards', component: CardsManage },
         // 超管区
         { path: '/super_base', component: BaseCache },
-        { path: '/super_hk3', component: HK3Cache }
+        { path: '/super_hk3', component: HK3Cache },
+        { path: '/super_aks', component: AKsCache }
       ]
     }
   ]

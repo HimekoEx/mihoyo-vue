@@ -11,9 +11,9 @@
     <el-card>
       <!-- 选择框 -->
       <div>
-        <el-select v-model="activateForm.project_name" placeholder="请选择项目">
+        <el-select v-model="activateForm.project" placeholder="请选择项目">
           <el-option label="崩坏3" value="Honkai3RD"></el-option>
-          <el-option label="明日方舟" value="aks" disabled></el-option>
+          <el-option label="明日方舟" value="Arknights"></el-option>
         </el-select>
         <el-tooltip effect="dark" content="激活" placement="top" :enterable="false">
           <el-button icon="iconfont icon-APIshuchu" type="primary" @click="activateCDK"></el-button>
@@ -40,7 +40,7 @@ export default {
     return {
       // 激活表单
       activateForm: {
-        project_name: '',
+        project: '',
         cdk: ''
       }
     }
@@ -48,7 +48,7 @@ export default {
   methods: {
     // 激活CDK
     activateCDK() {
-      if (this.$utils.isEmpty(this.activateForm.project_name)) return
+      if (this.$utils.isEmpty(this.activateForm.project)) return
       if (this.$utils.isEmpty(this.activateForm.cdk)) return
 
       this.$API
@@ -80,7 +80,7 @@ export default {
     // 清空输入框
     celanCDK() {
       this.activateForm = {
-        project_name: '',
+        project: '',
         cdk: ''
       }
     }

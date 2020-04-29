@@ -11,18 +11,18 @@
     <el-card>
       <!-- 搜索栏区 -->
       <div class="query">
-        <el-select v-model="cardsListForm.project_name" placeholder="选择项目">
+        <el-select v-model="cardsListForm.project" @change="listCards">
           <el-option label="所有项目" value></el-option>
           <el-option label="崩坏3" value="Honkai3RD"></el-option>
-          <el-option label="明日方舟" value="aks" disabled></el-option>
+          <el-option label="明日方舟" value="Arknights"></el-option>
         </el-select>
-        <el-select v-model="cardsListForm.level" placeholder="选择级别">
+        <el-select v-model="cardsListForm.level" @change="listCards">
           <el-option label="所有版本" :value="0"></el-option>
           <el-option label="珀金版" :value="3"></el-option>
           <el-option label="黄金版" :value="2"></el-option>
           <el-option label="青铜版" :value="1"></el-option>
         </el-select>
-        <el-select v-model="cardsListForm.time" placeholder="选择时效">
+        <el-select v-model="cardsListForm.time" @change="listCards">
           <el-option label="所有时效" :value="0"></el-option>
           <el-option label="年卡" :value="7"></el-option>
           <el-option label="半年" :value="6"></el-option>
@@ -76,7 +76,7 @@
           :resizable="false"
           align="center"
         ></el-table-column>
-        <el-table-column label="项目名" width="100" prop="project_name" show-overflow-tooltip></el-table-column>
+        <el-table-column label="项目名" width="100" prop="project" show-overflow-tooltip></el-table-column>
         <el-table-column label="创建者" width="150" prop="creator" show-overflow-tooltip></el-table-column>
         <el-table-column label="级别" width="80" :resizable="false" align="center">
           <template slot-scope="scope">
@@ -113,13 +113,7 @@
         <el-table-column label="卡密" header-align="center">
           <template slot-scope="scope">
             <div class="cdk">
-              <el-tooltip
-                effect="dark"
-                content="复制"
-                placement="top"
-                :enterable="false"
-                :disabled="scope.$index > 0"
-              >
+              <el-tooltip content="复制" :enterable="false" :disabled="scope.$index > 0">
                 <el-button
                   icon="iconfont icon-zhihangfankui"
                   type="info"
@@ -176,9 +170,9 @@
     >
       <!-- 项目选择器 -->
       <div>
-        <el-select v-model="cardsCreateForm.project_name" placeholder="选择项目">
+        <el-select v-model="cardsCreateForm.project" placeholder="选择项目">
           <el-option label="崩坏3" value="Honkai3RD"></el-option>
-          <el-option label="明日方舟" value="aks" disabled></el-option>
+          <el-option label="明日方舟" value="Arknights"></el-option>
         </el-select>
       </div>
 
@@ -252,7 +246,7 @@ export default {
     return {
       // 卡密列表查询表单
       cardsListForm: {
-        project_name: '',
+        project: '',
         creator: '',
         level: 0,
         time: 0,
@@ -261,14 +255,9 @@ export default {
         page_num: 1,
         page_size: 5
       },
-      // 更改状态表单
-      changeStatusForm: {
-        id: 0,
-        status: false
-      },
       // 卡密创建表单
       cardsCreateForm: {
-        project_name: '',
+        project: '',
         number: 0,
         level: 0,
         time: 0
@@ -295,7 +284,6 @@ export default {
       this.$API
         .cardsList(this.cardsListForm)
         .then(res => {
-          // 获取失败
           if (res.status !== 200) {
             return this.$notify.error({
               title: `获取失败(${res.status})`,
@@ -311,29 +299,11 @@ export default {
         })
         .catch(this.$API.error)
     },
-    // 复制成功事件
-    onCopy() {
-      this.$message.success({
-        message: '复制成功',
-        duration: 1000
-      })
-    },
-    // 复制失败事件
-    onError() {
-      this.$message.success({
-        message: '复制失败',
-        duration: 1500
-      })
-    },
     // 更改卡密状态
     changeStatus(card) {
-      this.changeStatusForm.id = card.id
-      this.changeStatusForm.status = card.status
-
       this.$API
-        .cardsChangeStatus(this.changeStatusForm)
+        .cardsChangeStatus({ id: card.id, status: card.status })
         .then(res => {
-          // 操作失败
           if (res.status !== 200) {
             card.status = !card.status
             return this.$notify.error({
@@ -344,11 +314,39 @@ export default {
             })
           }
 
-          // 成功更改
           this.$message.success({
             message: res.msg,
             duration: 1500
           })
+        })
+        .catch(this.$API.error)
+    },
+    // 创建卡密
+    createCards() {
+      if (this.$utils.isEmpty(this.cardsCreateForm.project)) return
+      if (this.cardsCreateForm.number === 0) return
+      if (this.cardsCreateForm.level === 0) return
+      if (this.cardsCreateForm.time === 0) return
+
+      this.$API
+        .cardsCreate(this.cardsCreateForm)
+        .then(res => {
+          if (res.status !== 200) {
+            return this.$notify.error({
+              title: `操作失败(${res.status})`,
+              message: `错误信息: ${res.msg}`,
+              duration: 2000,
+              offset: 40
+            })
+          }
+
+          // 创建成功
+          this.$message.success({
+            message: '创建成功',
+            duration: 1500
+          })
+          this.listCards()
+          this.createCardsVisible = false
         })
         .catch(this.$API.error)
     },
@@ -380,41 +378,25 @@ export default {
     // 清空卡密创建表单
     cleanCreateCards() {
       this.cardsCreateForm = {
-        project_name: '',
+        project: '',
         number: 0,
         level: 0,
         time: 0
       }
     },
-    // 创建卡密
-    createCards() {
-      if (this.$utils.isEmpty(this.cardsCreateForm.project_name)) return
-      if (this.cardsCreateForm.number === 0) return
-      if (this.cardsCreateForm.level === 0) return
-      if (this.cardsCreateForm.time === 0) return
-
-      this.$API
-        .cardsCreate(this.cardsCreateForm)
-        .then(res => {
-          // 操作失败
-          if (res.status !== 200) {
-            return this.$notify.error({
-              title: `操作失败(${res.status})`,
-              message: `错误信息: ${res.msg}`,
-              duration: 2000,
-              offset: 40
-            })
-          }
-
-          // 创建成功
-          this.$message.success({
-            message: '创建成功',
-            duration: 1500
-          })
-          this.listCards()
-          this.createCardsVisible = false
-        })
-        .catch(this.$API.error)
+    // 复制成功事件
+    onCopy() {
+      this.$message.success({
+        message: '复制成功',
+        duration: 1000
+      })
+    },
+    // 复制失败事件
+    onError() {
+      this.$message.success({
+        message: '复制失败',
+        duration: 1500
+      })
     }
   }
 }

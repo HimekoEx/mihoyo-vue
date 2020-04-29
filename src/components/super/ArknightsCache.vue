@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>控制中心</el-breadcrumb-item>
-      <el-breadcrumb-item>Honkai3RD 缓存管理</el-breadcrumb-item>
+      <el-breadcrumb-item>Arknights 缓存管理</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区 -->
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-const Project = 'Honkai3RD'
+const Project = 'Arknights'
 export default {
   created() {
     if (!this.$utils.isEmpty(localStorage.hk_ps)) {

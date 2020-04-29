@@ -23,22 +23,19 @@
             <span>{{item.name}}</span>
           </el-col>
           <el-col :xs="12" :sm="8" class="value">
-            <span v-if="item.field != 'level'">{{userInfo[item.field]}}</span>
+            <span v-if="item.field != 'power'">{{userInfo[item.field]}}</span>
             <template v-else>
-              <el-tag type="danger" v-if="userInfo.level >= 300" effect="dark">
-                <b>{{$utils.formatUserLevel(userInfo.level)}}</b>
+              <el-tag type="danger" v-if="userInfo.power === 3" effect="dark" size="small">
+                <b>{{$utils.formatPowerLevel(userInfo.power)}}</b>
               </el-tag>
-              <el-tag type="warning" v-else-if="userInfo.level >= 100" effect="dark" size="small">
-                <b>{{$utils.formatUserLevel(userInfo.level)}}</b>
+              <el-tag type="warning" v-else-if="userInfo.power === 2" effect="dark" size="small">
+                <b>{{$utils.formatPowerLevel(userInfo.power)}}</b>
               </el-tag>
-              <el-tag type="success" v-else-if="userInfo.level >= 20" effect="dark" size="small">
-                <b>{{$utils.formatUserLevel(userInfo.level)}}</b>
+              <el-tag type="success" v-else-if="userInfo.power === 1" effect="dark" size="small">
+                <b>{{$utils.formatPowerLevel(userInfo.power)}}</b>
               </el-tag>
-              <el-tag v-else-if="userInfo.level >= 10" effect="dark" size="small">
-                <b>{{$utils.formatUserLevel(userInfo.level)}}</b>
-              </el-tag>
-              <el-tag type="info" v-else-if="userInfo.level < 10" effect="dark" size="small">
-                <b>{{$utils.formatUserLevel(userInfo.level)}}</b>
+              <el-tag type="info" v-else-if="userInfo.power === 0" effect="dark" size="small">
+                <b>{{$utils.formatPowerLevel(userInfo.power)}}</b>
               </el-tag>
             </template>
           </el-col>
@@ -50,19 +47,26 @@
         <!-- 选择框 -->
         <div>
           <el-select
-            v-model="cardInfoFirm.project_name"
+            v-model="cardInfoFirm.project"
             placeholder="请选择项目"
             @change="selectChange"
             clearable
             @clear="selectClean"
           >
             <el-option label="崩坏3" value="Honkai3RD"></el-option>
-            <el-option label="明日方舟" value="aks" disabled></el-option>
+            <el-option label="明日方舟" value="Arknights"></el-option>
           </el-select>
           <el-button icon="el-icon-refresh" type="primary" @click="getCardInfo"></el-button>
         </div>
 
         <!-- 卡密信息 -->
+        <el-row>
+          <el-col :xs="8" :sm="5" :md="4" :xl="2">
+            <i class="iconfont icon-icon_bangzhuwendang"></i>
+            <span>卡密级别:</span>
+          </el-col>
+          <el-col :span="5" class="card-info">{{$utils.formatCardLevel(cardInfo.level)}}</el-col>
+        </el-row>
         <el-row>
           <el-col :xs="8" :sm="5" :md="4" :xl="2">
             <i class="iconfont icon-clock"></i>
@@ -119,21 +123,22 @@ export default {
         qq_number: '',
         e_mail: '',
         status: false,
-        level: 0,
+        power: 0,
         gen_times: 0,
         avatar: '',
         created_at: 0
       },
       // 查询表单
       cardInfoFirm: {
-        project_name: ''
+        project: ''
       },
       // 用户卡密信息
       cardInfo: {
         user_name: '',
         expire_time: 0,
         current_card: 'null',
-        cards_record: []
+        cards_record: [],
+        level: 0
       },
       userItems: [
         { name: 'ID:', icon: 'iconfont icon-anquan', field: 'id' },
@@ -144,7 +149,12 @@ export default {
         },
         { name: 'QQ:', icon: 'iconfont icon-share', field: 'qq_number' },
         { name: '邮箱:', icon: 'iconfont icon-application', field: 'e_mail' },
-        { name: '级别:', icon: 'iconfont icon-guanfangbanben', field: 'level' },
+        { name: '级别:', icon: 'iconfont icon-guanfangbanben', field: 'power' },
+        {
+          name: 'UIF次数:',
+          icon: 'iconfont icon-tubiao-qiapian',
+          field: 'gen_times'
+        },
         {
           name: '创建日期:',
           icon: 'iconfont icon-renwujincheng',
@@ -156,7 +166,7 @@ export default {
   methods: {
     // 获取用户卡密信息
     getCardInfo() {
-      if (this.$utils.isEmpty(this.cardInfoFirm.project_name)) return
+      if (this.$utils.isEmpty(this.cardInfoFirm.project)) return
 
       this.$API
         .userCardInfo(this.cardInfoFirm)
@@ -182,7 +192,7 @@ export default {
     },
     // 选择框清空事件
     selectClean() {
-      this.cardInfoFirm.project_name = ''
+      this.cardInfoFirm.project = ''
       this.cardInfo = {
         user_name: '',
         expire_time: 0,
