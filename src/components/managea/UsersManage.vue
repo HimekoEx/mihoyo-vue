@@ -206,7 +206,7 @@ export default {
     // 验证字符串是否有特殊字符
     const checkSpecialKey = str => {
       var specialKey =
-        "[+`~!#$^&*()=|{}':;'\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'"
+        "(){}''\\[]<>！￥……（）【】‘；：”“'。，、？‘"
       for (var i = 0; i < str.length; i++) {
         if (specialKey.indexOf(str.substr(i, 1)) !== -1) return false
       }
@@ -242,7 +242,7 @@ export default {
         qq_number: '',
         e_mail: '',
         page_num: 1,
-        page_size: 5
+        page_size: 8
       },
       // 更改用户UIF生成次数表单
       changeTimesForm: {

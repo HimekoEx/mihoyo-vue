@@ -145,16 +145,16 @@ export default {
         qq_number: '',
         e_mail: '',
         page_num: 1,
-        page_size: 5
+        page_size: 8
       },
       // 查询总数
       total: 0,
       // 子项目列表
       projects: [],
       table: [
-        { value: 30, label: '铂金版' },
-        { value: 20, label: '黄金版' },
-        { value: 10, label: '青铜版' },
+        { value: 300, label: '铂金版' },
+        { value: 200, label: '黄金版' },
+        { value: 100, label: '青铜版' },
         { value: 0, label: '白嫖版' }
       ]
     }

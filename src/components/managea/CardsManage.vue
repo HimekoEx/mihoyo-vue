@@ -253,7 +253,7 @@ export default {
         cdkey: '',
         using_user: 'null',
         page_num: 1,
-        page_size: 5
+        page_size: 8
       },
       // 卡密创建表单
       cardsCreateForm: {

@@ -34,7 +34,7 @@ axios.interceptors.request.use(config => {
 })
 
 // 响应拦截
-axios.interceptors.response.use(function (response) {
+axios.interceptors.response.use(response => {
   stopLoading()
   return response
 }, error => {

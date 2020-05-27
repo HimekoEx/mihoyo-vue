@@ -114,7 +114,7 @@ export default {
         project: Project,
         channel: 'official',
         page_num: 1,
-        page_size: 5
+        page_size: 8
       },
       // 缓存设置表单
       cacheSetForm: {
@@ -158,7 +158,7 @@ export default {
           this.total = res.data.total
           this.cacheData = res.data.items
 
-          console.log(this.cacheData)
+          // console.log(this.cacheData)
         })
         .catch(this.$API.error)
     },
@@ -218,7 +218,7 @@ export default {
     },
     // 删除缓存
     delCache(row) {
-      console.log(row)
+      // console.log(row)
 
       this.$msgbox
         .confirm('红豆泥?', `删除缓存 - [${row.key}]`, {

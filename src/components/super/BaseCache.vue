@@ -96,7 +96,7 @@ export default {
       // 缓存列表查询表单
       cacheListForm: {
         page_num: 1,
-        page_size: 5
+        page_size: 8
       },
       // 缓存设置表当
       cacheSetForm: {
