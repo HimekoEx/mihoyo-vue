@@ -230,7 +230,7 @@ export default {
           this.$API
             .cacheOtherDel({
               project: Project,
-              channel: this.cacheListForm,
+              channel: this.cacheListForm.channel,
               key: row.key
             })
             .then(res => {

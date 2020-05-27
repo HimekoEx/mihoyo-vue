@@ -105,11 +105,6 @@ export default {
         value: '',
         force: false
       },
-      // 缓存删除表当
-      cacheDelForm: {
-        space: '',
-        key: ''
-      },
       // base缓存数据
       cacheData: [],
       // 查询总数
@@ -168,16 +163,15 @@ export default {
     },
     // 删除Base缓存
     delBaseCache(cacheInfo) {
+      // console.log(cacheInfo)
+
       if (this.$utils.isEmpty(cacheInfo.space)) return
       if (this.$utils.isEmpty(cacheInfo.key)) return
-
-      this.cacheDelForm.space = cacheInfo.space
-      this.cacheDelForm.key = cacheInfo.key
 
       this.$msgbox
         .confirm(
           '红豆泥?',
-          `删除缓存 - [Base:${this.cacheDelForm.space}:${this.cacheDelForm.key}]`,
+          `删除缓存 - [${cacheInfo.space}:${cacheInfo.key}]`,
           {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -186,7 +180,10 @@ export default {
         )
         .then(() => {
           this.$API
-            .cacheBaseDel(this.cacheDelForm)
+            .cacheBaseDel({
+              space: cacheInfo.space,
+              key: cacheInfo.key
+            })
             .then(res => {
               if (res.status !== 200) {
                 return this.$notify.error({
