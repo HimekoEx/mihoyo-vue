@@ -54,7 +54,7 @@
         </el-input>
         <el-input
           placeholder="请输入内容"
-          v-model="cardsListForm.using_user"
+          v-model="cardsListForm.using"
           clearable
           @clear="clearInput('using_user')"
         >
@@ -251,7 +251,7 @@ export default {
         level: 0,
         time: 0,
         cdkey: '',
-        using_user: 'null',
+        using: 'null',
         page_num: 1,
         page_size: 8
       },
