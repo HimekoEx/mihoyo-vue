@@ -10,7 +10,7 @@
     <!-- 卡片视图区 -->
     <el-card>
       <!-- 搜索栏区 -->
-      <div class="query">
+      <div class="query" @keyup.enter="keyUpEnter">
         <el-select v-model="cardsListForm.project" @change="listCards">
           <el-option label="所有项目" value></el-option>
           <el-option label="崩坏3" value="Honkai3RD"></el-option>
@@ -145,6 +145,16 @@
             ></el-switch>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="65" :resizable="false" align="center">
+          <template slot-scope="scope">
+          <el-button
+            icon="iconfont icon-shanchu"
+            type="danger"
+            size="mini"
+            @click="deleteCard(scope.row)"
+          ></el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 分页区 -->
@@ -175,7 +185,6 @@
           <el-option label="明日方舟" value="Arknights"></el-option>
         </el-select>
       </div>
-
       <div class="select">
         <!-- 卡密级别选择器 -->
         <el-select v-model="cardsCreateForm.level">
@@ -231,6 +240,20 @@
         <el-button type="danger" @click="createCards">创建</el-button>
       </div>
     </el-dialog>
+    <!-- 删除卡密对话框 -->
+    <el-dialog
+        title="删除"
+        :visible.sync="deleteDialogVisible"
+        width="30%"
+        top="20%"
+    >
+  <span></span>
+  <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="deleteDialogVisible = false">软删除</el-button>
+    <el-button type="danger" @click="deleteDialogVisible = false">硬删除</el-button>
+    <el-button @click="deleteDialogVisible = false">取 消</el-button>
+  </span>
+</el-dialog>
   </div>
 </template>
 
@@ -253,14 +276,14 @@ export default {
         cdkey: '',
         using: 'null',
         page_num: 1,
-        page_size: 8
+        page_size: 8,
       },
       // 卡密创建表单
       cardsCreateForm: {
         project: '',
         number: 0,
         level: 0,
-        time: 0
+        time: 0,
       },
       // 查询总数
       total: 0,
@@ -274,22 +297,28 @@ export default {
         { color: '#e6a23c', percentage: 40 },
         { color: '#5cb87a', percentage: 60 },
         { color: '#1989fa', percentage: 80 },
-        { color: '#6f7ad3', percentage: 100 }
-      ]
+        { color: '#6f7ad3', percentage: 100 },
+      ],
+      //控住删除对话框显示
+      deleteDialogVisible:false
     }
   },
   methods: {
+    //回车事件绑定
+    keyUpEnter() {
+      this.listCards()
+    },
     // 获取卡密列表
     listCards() {
       this.$API
         .cardsList(this.cardsListForm)
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200) {
             return this.$notify.error({
               title: `获取失败(${res.status})`,
               message: `错误信息: ${res.msg}`,
               duration: 2000,
-              offset: 40
+              offset: 40,
             })
           }
 
@@ -303,20 +332,20 @@ export default {
     changeStatus(card) {
       this.$API
         .cardsChangeStatus({ id: card.id, status: card.status })
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200) {
             card.status = !card.status
             return this.$notify.error({
               title: `操作失败(${res.status})`,
               message: `错误信息: ${res.msg}`,
               duration: 2000,
-              offset: 40
+              offset: 40,
             })
           }
 
           this.$message.success({
             message: res.msg,
-            duration: 1500
+            duration: 1500,
           })
         })
         .catch(this.$API.error)
@@ -330,20 +359,20 @@ export default {
 
       this.$API
         .cardsCreate(this.cardsCreateForm)
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200) {
             return this.$notify.error({
               title: `操作失败(${res.status})`,
               message: `错误信息: ${res.msg}`,
               duration: 2000,
-              offset: 40
+              offset: 40,
             })
           }
 
           // 创建成功
           this.$message.success({
             message: '创建成功',
-            duration: 1500
+            duration: 1500,
           })
           this.listCards()
           this.createCardsVisible = false
@@ -381,24 +410,30 @@ export default {
         project: '',
         number: 0,
         level: 0,
-        time: 0
+        time: 0,
       }
     },
     // 复制成功事件
     onCopy() {
       this.$message.success({
         message: '复制成功',
-        duration: 1000
+        duration: 1000,
       })
     },
     // 复制失败事件
     onError() {
       this.$message.success({
         message: '复制失败',
-        duration: 1500
+        duration: 1500,
       })
-    }
-  }
+    },
+    //删除卡密
+    deleteCard(Card) {
+      console.log(Card)
+      this.deleteDialogVisible = true
+      console.log(this.deleteDialogVisible)
+    },
+  },
 }
 </script>
 

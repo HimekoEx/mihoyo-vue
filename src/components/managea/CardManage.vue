@@ -10,7 +10,7 @@
     <!-- 卡片视图区 -->
     <el-card>
       <!-- 搜索栏区 -->
-      <div class="query">
+      <div class="query" @keyup.enter="keyUpEnter">
         <el-select v-model="projectListForm.project">
           <el-option label="崩坏3" value="Honkai3RD"></el-option>
           <el-option label="明日方舟" value="Arknights"></el-option>
@@ -160,6 +160,10 @@ export default {
     }
   },
   methods: {
+    //回车事件绑定
+     keyUpEnter(){
+     this.listProject()
+    },
     // 查询项目
     listProject() {
       this.$API

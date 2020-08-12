@@ -45,6 +45,15 @@
 
 <script>
 export default {
+  created() {
+    var _this = this
+    document.onkeydown = function (e) {
+      let key = window.event.keyCode
+      if (key === 13) {
+        _this.keyUpEnter()
+      }
+    }
+  },
   data() {
     return {
       // 登录表单绑定对象
@@ -79,13 +88,16 @@ export default {
   },
   methods: {
     // 登录
+    keyUpEnter() {
+      this.toLogin()
+    },
     toLogin() {
-      this.$refs.loginFormRef.validate(valid => {
+      this.$refs.loginFormRef.validate((valid) => {
         if (!valid) return
 
         this.$API
           .userLogin(this.loginForm)
-          .then(res => {
+          .then((res) => {
             // 登录失败
             if (res.status !== 200) {
               return this.$notify.error({

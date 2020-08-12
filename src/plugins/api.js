@@ -43,7 +43,7 @@ axios.interceptors.response.use(response => {
 })
 
 // 设置基础api接口url
-axios.defaults.baseURL = 'http://192.168.0.2:7000/api/v1/'
+axios.defaults.baseURL = 'http://127.0.0.1:7000/api/v1/'
 // 设置自动保存cookies
 axios.defaults.withCredentials = true
 

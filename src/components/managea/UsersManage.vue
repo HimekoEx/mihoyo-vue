@@ -10,7 +10,7 @@
     <!-- 卡片视图区 -->
     <el-card>
       <!-- 搜索栏区 -->
-      <div class="query">
+      <div class="query" @keyup.enter="keyUpEnter">
         <el-input
           placeholder="请输入内容"
           v-model="usersListForm.user_name"
@@ -38,7 +38,7 @@
             <b>邮箱</b>
           </template>
         </el-input>
-        <el-button icon="el-icon-search" type="primary" @click="listUsers"></el-button>
+        <el-button icon="el-icon-search" type="primary" @click="listUsers" @keyup.enter.native="keyUpEnter"></el-button>
       </div>
 
       <!-- 列表区 -->
@@ -89,7 +89,7 @@
             ></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" header-align="center" width="135" :resizable="false">
+        <el-table-column label="操作" header-align="center" width="200" :resizable="false">
           <template slot-scope="scope">
             <el-tooltip
               effect="dark"
@@ -119,6 +119,21 @@
                 size="mini"
                 :disabled="scope.row.pd"
                 @click="powerEdit(scope.row)"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              content="删除"
+              placement="top"
+              :enterable="false"
+              :disabled="scope.$index > 0"
+            >
+              <el-button
+                icon="iconfont icon-shanchu"
+                type="warning"
+                size="mini"
+                :disabled="scope.row.pd"
+                @click="deleteUser(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -191,6 +206,20 @@
         </el-radio-group>
       </div>
     </el-dialog>
+    <!-- 删除用户对话框 -->
+    <el-dialog
+  :title="usernameTitle"
+  :visible.sync="deleteDialogVisible"
+  width="30%"
+  top="20%"
+  >
+  <span></span>
+  <span slot="footer" class="dialog-footer">
+    <el-button type="danger" @click="deleteDialogVisible = false">软删除</el-button>
+    <el-button type="danger" @click="deleteDialogVisible = false">硬删除</el-button>
+    <el-button @click="deleteDialogVisible = false">取 消</el-button>
+  </span>
+</el-dialog>
   </div>
 </template>
 
@@ -290,10 +319,19 @@ export default {
       // 控制用户信息编辑对话框的显示
       infoEditVisible: false,
       // 控制用户权限编辑对话框的显示
-      powerEditVisible: false
+      powerEditVisible: false,
+      //控制用户删除对话框显示
+      deleteDialogVisible: false,
+      //删除用户名
+      usernameTitle:''
     }
   },
   methods: {
+    //回车事件绑定
+    keyUpEnter(){
+     this.listUsers()
+    }
+    ,
     // 获取用户列表
     listUsers() {
       this.$API
@@ -477,6 +515,11 @@ export default {
         created_at: ''
       }
       this.infoForm = { id: 0, user_name: '', qq_number: '', e_mail: '' }
+    },
+    //删除用户
+    deleteUser(user){
+      this.usernameTitle = "确认删除"+ user.user_name+"？"
+      this.deleteDialogVisible = true
     }
   }
 }
